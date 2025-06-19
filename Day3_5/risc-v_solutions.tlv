@@ -50,7 +50,7 @@
          //get data and send it as next instruction
          $instr[31:0] = $imem_rd_data[31:0];
          //decode the instruction instr[6:2] as it decodes IRSBJU
-         $is_i_instr = $instr[6:2] ==? 5'b0000x || $instr[6:2] ==? 5'001x0 || $instr[6:2] ==? 5'b11001;
+         $is_i_instr = $instr[6:2] ==? 5'b0000x || $instr[6:2] ==? 5'b001x0 || $instr[6:2] ==? 5'b11001;
          $is_r_instr = $instr[6:2] ==? 5'b01011 || $instr[6:2] ==? 5'b011x0 || $instr[6:2] ==? 5'b10100;
          $is_s_instr = $instr[6:2] ==? 5'b0100x;
          $is_b_instr = $instr[6:2] ==? 5'b11000;
@@ -58,13 +58,14 @@
          $is_u_instr = $instr[6:2] ==? 5'b0x101;
          //immediate bits decode
          $imm[31:0] = $is_i_instr ? { {21{$instr[31]}} ,  $instr[30:20] }:
-                      $is_s_instr ? { {21{$instr[31]}} ,  $instr[30:25], $instr[11:8], $instr[7]}:
-                      $is_b_instr ? { {21{$instr[31]}} ,  $instr[7], $instr[30:25], $instr[11:8], 1'b0}:
-                      $is_u_instr ? { $instr[31] , $instr[30:20] , $instr[19:12] , 12'b0} : 
-                      $is_j_instr ? { {12{$instr[31]}} , $instr[19:12] , $instr[20] , $instr[30:21] , 1'b0} : 32'b0;
+                      $is_s_instr ? { {21{$instr[31]}} ,  $instr[30:25], $instr[11:7], $instr[7]}:
+                      $is_b_instr ? { {20{$instr[31]}} ,  $instr[7], $instr[30:25], $instr[11:7], 1'b0}:
+                      $is_u_instr ? { $instr[31:12] , 12'b0} : 
+                      $is_j_instr ? { {12{$instr[31]}} , $instr[19:12] , $instr[20] , $instr[30:21] , 1'b0} : 
+                      32'b0;
          //Instruction field decode
          $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr;
-         $rs1_valid = $is_r_instr || $is_s_instr || $is_b_instr;
+         $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr;
          $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr;
          $funct3_valid = $is_r_instr || $is_s_instr || $is_b_instr;
          $funct7_valid = $is_r_instr;
